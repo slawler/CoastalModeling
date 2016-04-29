@@ -16,7 +16,7 @@ from datetime import datetime as dt
 
 #------------User Inputs----------------------------#
 infile = 'fort.63'
-
+''''---Enter Nodes of Interest in the nodes dictionary---'''
 nodes = {'1':[],'3':[],'23':[],'39':[],'43':[],'75':[],'2123':[],'2656':[],'2354':[],'265665':[],'1685434':[]}
 
 #------------------------------BEGIN SCRIPT----------------------------------#
