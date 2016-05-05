@@ -55,8 +55,7 @@ for d in daterange:
         data = r.content.decode()
         newfile = os.path.join(PATH,'%s.txt' % d)
 
-        with open(newfile,'w') as f:
-            f.write(data)
+        with open(newfile,'w') as f: f.write(data)
             
     except:
         with open(PATH +'/ErrorLog.txt', 'a') as f:
