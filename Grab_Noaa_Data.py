@@ -9,16 +9,14 @@ Created on Tue Apr  5 23:21:12 2016
 #---------------LOAD PYTHON MODULES-----------------------#
 from pandas import date_range, DateOffset
 from datetime import datetime
-from urllib import urlencode 
-from urllib2 import urlopen, Request
+import os, requests
 from time import sleep
-
 #---------------ENTER VARIABLES---------------------------#
 station   = str(8510560)                      #Station ID
 start     = datetime(2010, 1, 1,0)            #Start Date
-stop      = datetime(2015, 1, 1,0)            #End Date
+stop      = datetime(2011, 1, 1,0)            #End Date
 interval  = DateOffset(months=6)              #ChunkSize   
-PATH      = "C:\Users\slawler\Desktop\LinuxShare\NOAA"  #Download Directory 
+PATH      = "/home/slawler/Desktop"  #Download Directory 
 
 product   = "hourly_height"                   #Scalar of Interest  
 datum     = "msl"                             #Datum
@@ -53,13 +51,12 @@ for d in daterange:
                      'units':units,'time_zone':time_zone,'format':format,
                      'application':'web_services' }
                      
-        data     = urlencode(params)
-        request  = Request(url, data)
-        response = urlopen(request)
-        ouput    = response.read()
-        
-        with open(PATH + '/%s.out' % first,'w') as f:
-            f.write(ouput)
+        r = requests.get(url, params = params) 
+        data = r.content.decode()
+        newfile = os.path.join(PATH,'%s.txt' % d)
+
+        with open(newfile,'w') as f:
+            f.write(data)
             
     except:
         with open(PATH +'/ErrorLog.txt', 'a') as f:
@@ -75,4 +72,3 @@ with open(PATH + '/ErrorLog.txt', 'a') as f:
     f.write('Download Completed: ' + str(download_stop)+'\n')    
 
 print "=====END PROCESS: %s" %(str(download_stop)),"=====" 
-
