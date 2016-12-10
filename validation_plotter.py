@@ -22,19 +22,20 @@ from scipy.interpolate import interp1d
 # In[]:
 #------------------------------------User Inputs
 
-root_dir = r'C:\Users\sml\Desktop'
+root_dir = r'C:\Users\student.W7JF4Z7V1\Desktop\Arslaan ADCSWAN\Output\Hstart_Mfinal'
+
 adcirc_file = 'fort.61'
 
-start, freq = "09-2015-22 20:00","3600s" #---Date Format: %m-%Y-%d %H:%M
+start, freq = "09-2015-20 18:06","360s" #---Date Format: %m-%Y-%d %H:%M
 
-nodes = {'10':{'8571421':[]},'31':{'8632200':[]},'27':{'8636580':[]}}
+nodes = {'38':{'8638863':[]},'27':{'8632200':[]},'31':{'8636580':[]}}
 
 noaa_time_step = '6T'
 
 #--NOAA API https://tidesandcurrents.noaa.gov/api/
 datum     = "msl"   #"NAVD"                  #Datum
 units     = "metric"                         #Units
-time_zone = "lst_ldt"                         #Time Zone
+time_zone = "gmt"                         #Time Zone
 fmt       = "json"                            #Format
 url       = 'http://tidesandcurrents.noaa.gov/api/datagetter'
 product   = 'water_level'                     #Product
@@ -57,7 +58,7 @@ for line in fileinput.input(f):
         nodes[n][stations[n]].append(float(data))
         periods = len(nodes[n][stations[n]])
 
-for n in nodes:
+for n in nodes: #---This is sloppy, we can improve this: we just need the lenght of the array
     for key in nodes[n]:
         period = len(nodes[n][key])   
         
@@ -99,8 +100,24 @@ for n in nodes:
         print(g,'No Data')      
      
 idx = pd.date_range(first,periods = len(noaa.index), freq=noaa_time_step)   
-noaa = noaa.set_index(idx)       
-        
+noaa = noaa.set_index(idx)   
+    
+##################################--MAKE CHANGES HERE--######################   #, 'oooo':3
+#---Instructions:
+
+#-For each station, enter the datum shift value
+datum_dict = {'8632200':0.146,'8638863':0.075,'8636580':0.073}
+
+adcirc = pd.DataFrame()
+
+df = noaa.merge(adcirc, how='outer', left_index=True, right_index=True)
+
+for key in datum_dict: 
+    if key in noaa:
+        df[key] = df[key]-datum_dict[key]
+    else:
+        print('Key not found: ',key)
+             
 # In[]:
 #--------------------------Create ADCIRC DataFrame
 
@@ -117,12 +134,11 @@ adcirc = adcirc.set_index(adc_idx)
 # In[]:
 #-------------------------Join ADCIRC & NOAA Dataframes, Resample ADCIRC values
 
-df = noaa.merge(adcirc, how='outer', left_index=True, right_index=True)
+df = df.merge(adcirc, how='outer', left_index=True, right_index=True)
 
 for n in nodes:
     df[n] = df[n].interpolate()
-
-    
+ 
     
 # In[]:
 #--------------------------Plot Results for Each Station        
