@@ -1,2 +1,2 @@
 # CoastalModeling
-Scripts Used for working with ADCIRC files
+Scripts for Coastal Engineering Applications
